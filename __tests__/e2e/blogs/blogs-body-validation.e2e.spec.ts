@@ -40,7 +40,7 @@ describe('Blog API body validation check', () => {
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet1.body.errorMessages).toHaveLength(3);
+    expect(invalidDataSet1.body.errorsMessages).toHaveLength(3);
 
     const invalidDataSet2 = await request(app)
       .post(BLOGS_PATH)
@@ -53,7 +53,7 @@ describe('Blog API body validation check', () => {
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet2.body.errorMessages).toHaveLength(3);
+    expect(invalidDataSet2.body.errorsMessages).toHaveLength(3);
 
     const invalidDataSet3 = await request(app)
       .post(BLOGS_PATH)
@@ -61,7 +61,7 @@ describe('Blog API body validation check', () => {
       .send({ ...correctDto, name: '1234567890123456' })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
+    expect(invalidDataSet3.body.errorsMessages).toHaveLength(1);
 
     const blogListResponse = await request(app).get(BLOGS_PATH);
     expect(blogListResponse.body).toHaveLength(0);
@@ -82,7 +82,7 @@ describe('Blog API body validation check', () => {
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet1.body.errorMessages).toHaveLength(3);
+    expect(invalidDataSet1.body.errorsMessages).toHaveLength(3);
 
     const invalidDataSet2 = await request(app)
       .put(`${BLOGS_PATH}/${createdId}`)
@@ -90,7 +90,7 @@ describe('Blog API body validation check', () => {
       .send({ ...correctDto, name: '1234567890123456' })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet2.body.errorMessages).toHaveLength(1);
+    expect(invalidDataSet2.body.errorsMessages).toHaveLength(1);
 
     const blogResponse = await getBlogById(app, createdId);
     expect(blogResponse).toEqual(createdBlog);

@@ -20,9 +20,9 @@ components:
 
     ValidationError:
       type: object
-      required: [errorMessages]
+      required: [errorsMessages]
       properties:
-        errorMessages:
+        errorsMessages:
           type: array
           items:
             $ref: '#/components/schemas/ValidationErrorItem'

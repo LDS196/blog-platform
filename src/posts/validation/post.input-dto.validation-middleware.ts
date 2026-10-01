@@ -27,8 +27,8 @@ const blogIdValidation = body('blogId')
   });
 
 export const postByBlogInputDtoValidation = [
-  titleValidation,
   shortDescriptionValidation,
+  titleValidation,
   contentValidation,
 ];
 

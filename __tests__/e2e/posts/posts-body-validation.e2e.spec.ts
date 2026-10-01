@@ -45,7 +45,7 @@ describe('Post API body validation check', () => {
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet1.body.errorMessages).toHaveLength(4);
+    expect(invalidDataSet1.body.errorsMessages).toHaveLength(4);
 
     const invalidDataSet2 = await request(app)
       .post(POSTS_PATH)
@@ -58,7 +58,7 @@ describe('Post API body validation check', () => {
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet2.body.errorMessages).toHaveLength(3);
+    expect(invalidDataSet2.body.errorsMessages).toHaveLength(3);
 
     const invalidDataSet3 = await request(app)
       .post(POSTS_PATH)
@@ -66,7 +66,7 @@ describe('Post API body validation check', () => {
       .send({ ...correctDto, title: 't'.repeat(31) })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
+    expect(invalidDataSet3.body.errorsMessages).toHaveLength(1);
 
     const postListResponse = await request(app).get(POSTS_PATH);
     expect(postListResponse.body).toHaveLength(0);
@@ -95,7 +95,7 @@ describe('Post API body validation check', () => {
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet1.body.errorMessages).toHaveLength(4);
+    expect(invalidDataSet1.body.errorsMessages).toHaveLength(4);
 
     const invalidDataSet2 = await request(app)
       .put(`${POSTS_PATH}/${createdId}`)
@@ -103,7 +103,7 @@ describe('Post API body validation check', () => {
       .send({ ...correctDto, title: 't'.repeat(31) })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet2.body.errorMessages).toHaveLength(1);
+    expect(invalidDataSet2.body.errorsMessages).toHaveLength(1);
 
     const postResponse = await getPostById(app, createdId);
     expect(postResponse).toEqual(createdPost);
