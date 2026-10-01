@@ -6,9 +6,7 @@ export const idValidation = param('id')
   .exists()
   .withMessage('ID is required')
   .isString()
-  .withMessage('ID must be a string')
-  .isNumeric()
-  .withMessage('ID must be a numeric string');
+  .withMessage('ID must be a string');
 
 // Для JSON:API-обновления: id в теле (data.id) должен совпадать с id в URL.
 export const dataIdMatchValidation = body('data.id')

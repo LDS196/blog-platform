@@ -34,7 +34,7 @@ export const blogsRepository = {
     if (blogIndex === -1) {
       return false;
     }
-    db.blogs = db.blogs.splice(blogIndex, 1);
+    db.blogs.splice(blogIndex, 1);
     return true;
   },
 };

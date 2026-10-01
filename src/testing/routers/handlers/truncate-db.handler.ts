@@ -4,7 +4,7 @@ import { HttpStatus } from '../../../core/types/http-statuses';
 
 // Полностью очищает данные (используется в e2e-тестах перед прогоном).
 export function truncateDbHandler(req: Request, res: Response) {
-  db.drivers = [];
-  db.rides = [];
+  db.blogs = [];
+  db.posts = [];
   res.sendStatus(HttpStatus.NoContent);
 }

@@ -1,0 +1,44 @@
+import { Router } from 'express';
+import { POSTS_ROUTES } from '../constants/posts.paths';
+import { getPostsListHandler } from './handlers/get-posts-list.handler';
+import { getPostHandler } from './handlers/get-post.handler';
+import { createPostHandler } from './handlers/create-post.handler';
+import { updatePostHandler } from './handlers/update-post.handler';
+import { deletePostHandler } from './handlers/delete-post.handler';
+import postInputDtoValidation from '../validation/post.input-dto.validation-middleware';
+import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
+import { idValidation } from '../../core/middlewares/validation/params-id.validation.middleware';
+import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard.middleware';
+
+export const postsRouter = Router();
+
+postsRouter
+  .get(POSTS_ROUTES.ROOT, getPostsListHandler)
+  .get(
+    POSTS_ROUTES.BY_ID,
+    idValidation,
+    inputValidationResultMiddleware,
+    getPostHandler,
+  )
+  .post(
+    POSTS_ROUTES.ROOT,
+    superAdminGuardMiddleware,
+    postInputDtoValidation,
+    inputValidationResultMiddleware,
+    createPostHandler,
+  )
+  .put(
+    POSTS_ROUTES.BY_ID,
+    superAdminGuardMiddleware,
+    idValidation,
+    postInputDtoValidation,
+    inputValidationResultMiddleware,
+    updatePostHandler,
+  )
+  .delete(
+    POSTS_ROUTES.BY_ID,
+    superAdminGuardMiddleware,
+    idValidation,
+    inputValidationResultMiddleware,
+    deletePostHandler,
+  );
