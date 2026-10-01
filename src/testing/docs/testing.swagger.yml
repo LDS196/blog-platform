@@ -5,6 +5,7 @@ tags:
 paths:
   /api/testing/all-data:
     delete:
+      operationId: deleteAllData
       summary: 'Clear database: delete all data from all tables/collections'
       tags: [Testing]
       responses:

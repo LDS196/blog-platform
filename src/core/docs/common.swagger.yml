@@ -1,0 +1,28 @@
+components:
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    ValidationErrorItem:
+      type: object
+      required: [field, message]
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+
+    ValidationError:
+      type: object
+      required: [errorMessages]
+      properties:
+        errorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationErrorItem'

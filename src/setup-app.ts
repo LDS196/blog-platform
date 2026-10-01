@@ -6,6 +6,7 @@ import { POSTS_PATH } from './posts/constants/posts.paths';
 import { postsRouter } from './posts/routers/posts.router';
 import { TESTING_PATH } from './testing/constants/testing.paths';
 import { testingRouter } from './testing/routers/testing.router';
+import { setupSwagger } from './core/swagger/setup-swagger';
 
 export const setupApp = (app: Express) => {
   app.use(express.json());
@@ -13,6 +14,8 @@ export const setupApp = (app: Express) => {
   app.get('/', (reg: Request, res: Response) => {
     res.status(HttpStatus.Ok).send('Hello world!');
   });
+
+  setupSwagger(app);
 
   app.use(BLOGS_PATH, blogsRouter);
   app.use(POSTS_PATH, postsRouter);
