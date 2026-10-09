@@ -1,15 +1,19 @@
+import 'dotenv/config';
 import express from 'express';
 import { setupApp } from './setup-app';
-import { SETTINGS } from './settings/config';
+import { runDB } from './db/mongo.db';
 
-const app = express();
-setupApp(app);
+const bootstrap = async () => {
+  const app = express();
+  setupApp(app);
+  await runDB(process.env.DB_URL, process.env.DB_NAME);
 
-export default app;
+  if (!process.env.VERCEL) {
+    const PORT = process.env.PORT;
+    app.listen(PORT, () => {
+      console.log(`Example app listening on port ${PORT}`);
+    });
+  }
+};
 
-if (!process.env.VERCEL) {
-  const PORT = SETTINGS.PORT;
-  app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`);
-  });
-}
+bootstrap();

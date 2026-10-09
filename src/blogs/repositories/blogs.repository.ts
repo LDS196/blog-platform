@@ -1,40 +1,44 @@
-import { db } from '../../db/in-memory.db';
+import { WithId } from 'mongodb';
+import { toObjectId } from '../../core/utils/to-objectId';
+import { blogsCollection } from '../../db/collections';
 import { TBlog } from '../types/blog';
-import { BlogInputDto } from '../dto/blog.input.dto';
+import { TBlogInputDto } from '../dto/blog.input.dto';
 
 export const blogsRepository = {
-  findAll: (): TBlog[] => {
-    return db.blogs;
+  findAll: async (): Promise<WithId<TBlog>[]> => {
+    return blogsCollection.find({}).toArray();
   },
-  findById: (id: string): TBlog | null => {
-    return db.blogs.find((b) => b.id === id) ?? null;
+  findById: async (id: string): Promise<WithId<TBlog> | null> => {
+    const objectId = toObjectId(id);
+    if (!objectId) {
+      return null;
+    }
+    return blogsCollection.findOne({ _id: objectId });
   },
-  create: (blog: BlogInputDto): TBlog => {
-    const newBlog: TBlog = {
+  create: async (blog: TBlog): Promise<WithId<TBlog>> => {
+    const result = await blogsCollection.insertOne(blog);
+    return {
+      _id: result.insertedId,
       ...blog,
-      id: crypto.randomUUID(),
     };
-    db.blogs.push(newBlog);
-    return newBlog;
   },
-  update: (id: string, blog: BlogInputDto): boolean => {
-    const blogIndex = db.blogs.findIndex((b) => b.id === id);
-    if (blogIndex === -1) {
+  update: async (id: string, blog: TBlogInputDto): Promise<boolean> => {
+    const objectId = toObjectId(id);
+    if (!objectId) {
       return false;
     }
-    db.blogs[blogIndex] = {
-      ...db.blogs[blogIndex],
-      ...blog,
-      id: id,
-    };
-    return true;
+    const result = await blogsCollection.updateOne(
+      { _id: objectId },
+      { $set: blog },
+    );
+    return result.modifiedCount > 0;
   },
-  delete: (id: string): boolean => {
-    const blogIndex = db.blogs.findIndex((b) => b.id === id);
-    if (blogIndex === -1) {
+  delete: async (id: string): Promise<boolean> => {
+    const objectId = toObjectId(id);
+    if (!objectId) {
       return false;
     }
-    db.blogs.splice(blogIndex, 1);
-    return true;
+    const result = await blogsCollection.deleteOne({ _id: objectId });
+    return result.deletedCount > 0;
   },
 };

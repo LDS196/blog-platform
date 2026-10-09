@@ -1,21 +1,21 @@
 import { ValidationError, validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from 'express';
 import {
-  ValidationErrorType,
-  ValidationErrorDto,
+  TValidationErrorType,
+  TValidationErrorDto,
 } from '../../types/validation-error';
 import { HttpStatus } from '../../types/http-statuses';
 
 // Оборачивает список ошибок в единый формат ответа: { errorsMessages: [...] }.
 export const createErrorMessages = (
-  errors: ValidationErrorType[],
-): ValidationErrorDto => {
+  errors: TValidationErrorType[],
+): TValidationErrorDto => {
   return { errorsMessages: errors };
 };
 
 // Приводит ошибку express-validator к нашему формату { field, message }.
 // У ошибок типа 'field' (body/param — а других валидаторов у нас нет) есть путь к полю.
-const formatErrors = (error: ValidationError): ValidationErrorType => {
+const formatErrors = (error: ValidationError): TValidationErrorType => {
   if (error.type === 'field') {
     return { field: error.path, message: error.msg };
   }

@@ -3,13 +3,14 @@ import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/middlewares/validation/input-validation-result.middleware';
 import { blogsRepository } from '../../repositories/blogs.repository';
 import { postsRepository } from '../../../posts/repositories/posts.repository';
-import { PostByBlogInputDto } from '../../../posts/dto/post.input.dto';
+import { TPostByBlogInputDto } from '../../../posts/dto/post.input.dto';
+import { mapToPostOutput } from '../../../posts/routers/mappers/map-list-posts-to-output';
 
-export function createBlogPostHandler(
-  req: Request<{ id: string }, {}, PostByBlogInputDto>,
+export async function createBlogPostHandler(
+  req: Request<{ id: string }, {}, TPostByBlogInputDto>,
   res: Response,
 ) {
-  const blog = blogsRepository.findById(req.params.id);
+  const blog = await blogsRepository.findById(req.params.id);
 
   if (!blog) {
     res
@@ -18,9 +19,11 @@ export function createBlogPostHandler(
     return;
   }
 
-  const createdPost = postsRepository.create({
+  const createdPost = await postsRepository.create({
     ...req.body,
-    blogId: blog.id,
+    blogId: blog._id.toString(),
+    blogName: blog.name,
+    createdAt: new Date().toISOString(),
   });
 
   if (!createdPost) {
@@ -32,5 +35,5 @@ export function createBlogPostHandler(
     return;
   }
 
-  res.status(HttpStatus.Created).send(createdPost);
+  res.status(HttpStatus.Created).send(mapToPostOutput(createdPost));
 }

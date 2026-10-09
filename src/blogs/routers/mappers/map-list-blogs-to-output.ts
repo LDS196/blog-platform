@@ -1,9 +1,18 @@
-import { BlogOutputDto } from '../../dto/blog.output.dto';
+import { WithId } from 'mongodb';
+import { TBlogOutputDto } from '../../dto/blog.output.dto';
 import { TBlog } from '../../types/blog';
 
-// Ответ со списком (JSON:API list). Каждый элемент маппится тем же
-// mapDriverToResource, что и одиночный ресурс — без дублирования логики.
-export const mapToBlogsListOutput = (blogs: TBlog[]): BlogOutputDto[] => {
-  // some logic
-  return blogs.map((b) => b);
+export const mapToBlogOutput = (blog: WithId<TBlog>): TBlogOutputDto => ({
+  id: blog._id.toString(),
+  name: blog.name,
+  description: blog.description,
+  websiteUrl: blog.websiteUrl,
+  createdAt: blog.createdAt,
+  isMembership: blog.isMembership,
+});
+
+export const mapToBlogsListOutput = (
+  blogs: WithId<TBlog>[],
+): TBlogOutputDto[] => {
+  return blogs.map(mapToBlogOutput);
 };

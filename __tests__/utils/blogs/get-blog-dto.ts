@@ -1,6 +1,6 @@
-import { BlogInputDto } from '../../../src/blogs/dto/blog.input.dto';
+import { TBlogInputDto } from '../../../src/blogs/dto/blog.input.dto';
 
-export function getBlogDto(): BlogInputDto {
+export function getBlogDto(): TBlogInputDto {
   return {
     name: 'Test blog',
     description: 'Test description',

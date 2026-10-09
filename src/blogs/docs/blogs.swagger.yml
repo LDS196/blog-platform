@@ -139,14 +139,22 @@ components:
           example: https://example.com
     BlogOutput:
       type: object
-      required: [id, name, description, websiteUrl]
+      required: [id, name, description, websiteUrl, createdAt, isMembership]
       properties:
         id:
           type: string
-          format: uuid
+          pattern: '^[0-9a-fA-F]{24}$'
+          example: '507f1f77bcf86cd799439011'
         name:
           type: string
         description:
           type: string
         websiteUrl:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T12:00:00.000Z'
+        isMembership:
+          type: boolean
+          example: false

@@ -4,16 +4,25 @@ import { createErrorMessages } from '../../../core/middlewares/validation/input-
 import { blogsRepository } from '../../repositories/blogs.repository';
 import { postsRepository } from '../../../posts/repositories/posts.repository';
 
-export function deleteBlogHandler(req: Request<{ id: string }>, res: Response) {
-  const isDeleted = blogsRepository.delete(req.params.id);
+export async function deleteBlogHandler(
+  req: Request<{ id: string }>,
+  res: Response,
+) {
+  try {
+    const isDeleted = await blogsRepository.delete(req.params.id);
 
-  if (!isDeleted) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(createErrorMessages([{ field: 'id', message: 'Blog not found' }]));
-    return;
+    if (!isDeleted) {
+      res
+        .status(HttpStatus.NotFound)
+        .send(
+          createErrorMessages([{ field: 'id', message: 'Blog not found' }]),
+        );
+      return;
+    }
+
+    postsRepository.deleteByBlogId(req.params.id);
+    res.sendStatus(HttpStatus.NoContent);
+  } catch (error) {
+    res.sendStatus(HttpStatus.InternalServerError);
   }
-
-  postsRepository.deleteByBlogId(req.params.id);
-  res.sendStatus(HttpStatus.NoContent);
 }
