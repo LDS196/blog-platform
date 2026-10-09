@@ -138,14 +138,16 @@ components:
           maxLength: 1000
         blogId:
           type: string
-          format: uuid
+          pattern: '^[0-9a-fA-F]{24}$'
+          example: '507f1f77bcf86cd799439011'
     PostOutput:
       type: object
-      required: [id, title, shortDescription, content, blogId, blogName]
+      required: [id, title, shortDescription, content, blogId, blogName, createdAt]
       properties:
         id:
           type: string
-          format: uuid
+          pattern: '^[0-9a-fA-F]{24}$'
+          example: '507f1f77bcf86cd799439011'
         title:
           type: string
         shortDescription:
@@ -154,6 +156,11 @@ components:
           type: string
         blogId:
           type: string
-          format: uuid
+          pattern: '^[0-9a-fA-F]{24}$'
+          example: '507f1f77bcf86cd799439011'
         blogName:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T12:00:00.000Z'

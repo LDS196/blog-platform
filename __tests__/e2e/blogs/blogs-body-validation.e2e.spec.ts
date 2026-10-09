@@ -2,7 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { BlogInputDto } from '../../../src/blogs/dto/blog.input.dto';
+import { TBlogInputDto } from '../../../src/blogs/dto/blog.input.dto';
 import { BLOGS_PATH } from '../../../src/blogs/constants/blogs.paths';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { clearDb } from '../../utils/clear-db';
@@ -15,7 +15,7 @@ describe('Blog API body validation check', () => {
   setupApp(app);
 
   const adminToken = generateBasicAuthToken();
-  const correctDto: BlogInputDto = getBlogDto();
+  const correctDto: TBlogInputDto = getBlogDto();
 
   beforeAll(async () => {
     await clearDb(app);

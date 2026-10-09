@@ -3,8 +3,11 @@ import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/middlewares/validation/input-validation-result.middleware';
 import { postsRepository } from '../../repositories/posts.repository';
 
-export function deletePostHandler(req: Request<{ id: string }>, res: Response) {
-  const isDeleted = postsRepository.delete(req.params.id);
+export async function deletePostHandler(
+  req: Request<{ id: string }>,
+  res: Response,
+) {
+  const isDeleted = await postsRepository.delete(req.params.id);
 
   if (!isDeleted) {
     res

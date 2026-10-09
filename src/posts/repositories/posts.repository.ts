@@ -1,60 +1,37 @@
-import { db } from '../../db/in-memory.db';
+import { ObjectId, WithId } from 'mongodb';
+import { postsCollection } from '../../db/collections';
 import { TPost } from '../types/post';
-import { PostInputDto } from '../dto/post.input.dto';
-import { blogsRepository } from '../../blogs/repositories/blogs.repository';
+import { TPostInputDto } from '../dto/post.input.dto';
 
 export const postsRepository = {
-  findAll: (): TPost[] => {
-    return db.posts;
+  findAll: async (): Promise<WithId<TPost>[]> => {
+    return await postsCollection.find().toArray();
   },
-  findById: (id: string): TPost | null => {
-    return db.posts.find((p) => p.id === id) ?? null;
+  findById: async (id: string): Promise<WithId<TPost> | null> => {
+    return await postsCollection.findOne({ _id: new ObjectId(id) });
   },
-  findByBlogId: (blogId: string): TPost[] => {
-    return db.posts.filter((p) => p.blogId === blogId);
+  findByBlogId: async (blogId: string): Promise<WithId<TPost>[]> => {
+    return await postsCollection.find({ blogId }).toArray();
   },
-  create: (post: PostInputDto): TPost | null => {
-    const blog = blogsRepository.findById(post.blogId);
-    if (!blog) {
-      return null;
-    }
-
-    const newPost: TPost = {
+  create: async (post: TPost): Promise<WithId<TPost> | null> => {
+    const result = await postsCollection.insertOne(post);
+    return {
+      _id: result.insertedId,
       ...post,
-      id: crypto.randomUUID(),
-      blogName: blog.name,
     };
-    db.posts.push(newPost);
-    return newPost;
   },
-  update: (id: string, post: PostInputDto): boolean => {
-    const postIndex = db.posts.findIndex((p) => p.id === id);
-    if (postIndex === -1) {
-      return false;
-    }
-
-    const blog = blogsRepository.findById(post.blogId);
-    if (!blog) {
-      return false;
-    }
-
-    db.posts[postIndex] = {
-      ...db.posts[postIndex],
-      ...post,
-      blogName: blog.name,
-      id,
-    };
-    return true;
+  update: async (id: string, post: TPostInputDto): Promise<boolean> => {
+    const result = await postsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: post },
+    );
+    return result.modifiedCount > 0;
   },
-  delete: (id: string): boolean => {
-    const postIndex = db.posts.findIndex((p) => p.id === id);
-    if (postIndex === -1) {
-      return false;
-    }
-    db.posts.splice(postIndex, 1);
-    return true;
+  delete: async (id: string): Promise<boolean> => {
+    const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount > 0;
   },
-  deleteByBlogId: (blogId: string): void => {
-    db.posts = db.posts.filter((p) => p.blogId !== blogId);
+  deleteByBlogId: async (blogId: string): Promise<void> => {
+    await postsCollection.deleteMany({ blogId });
   },
 };

@@ -2,7 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { PostInputDto } from '../../../src/posts/dto/post.input.dto';
+import { TPostInputDto } from '../../../src/posts/dto/post.input.dto';
 import { POSTS_PATH } from '../../../src/posts/constants/posts.paths';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { clearDb } from '../../utils/clear-db';
@@ -10,15 +10,15 @@ import { createBlog } from '../../utils/blogs/create-blog';
 import { getPostDto } from '../../utils/posts/get-post-dto';
 import { createPost } from '../../utils/posts/create-post';
 import { getPostById } from '../../utils/posts/get-post-by-id';
-import { BlogOutputDto } from '../../../src/blogs/dto/blog.output.dto';
+import { TBlogOutputDto } from '../../../src/blogs/dto/blog.output.dto';
 
 describe('Post API body validation check', () => {
   const app = express();
   setupApp(app);
 
   const adminToken = generateBasicAuthToken();
-  let blog: BlogOutputDto;
-  let correctDto: PostInputDto;
+  let blog: TBlogOutputDto;
+  let correctDto: TPostInputDto;
 
   beforeAll(async () => {
     await clearDb(app);

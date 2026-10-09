@@ -2,7 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { PostInputDto } from '../../../src/posts/dto/post.input.dto';
+import { TPostInputDto } from '../../../src/posts/dto/post.input.dto';
 import { POSTS_PATH } from '../../../src/posts/constants/posts.paths';
 import { BLOGS_PATH } from '../../../src/blogs/constants/blogs.paths';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
@@ -25,7 +25,7 @@ describe('Post API', () => {
 
   it('✅ should create post; POST /api/posts', async () => {
     const blog = await createBlog(app);
-    const newPost: PostInputDto = {
+    const newPost: TPostInputDto = {
       ...getPostDto(blog.id),
       title: 'New post',
     };
@@ -39,6 +39,7 @@ describe('Post API', () => {
       content: newPost.content,
       blogId: blog.id,
       blogName: blog.name,
+      createdAt: expect.any(String),
     });
   });
 
@@ -66,7 +67,7 @@ describe('Post API', () => {
     const blog = await createBlog(app);
     const createdPost = await createPost(app, blog.id);
 
-    const postUpdateData: PostInputDto = {
+    const postUpdateData: TPostInputDto = {
       title: 'Updated post',
       shortDescription: 'Updated short description',
       content: 'Updated content',
@@ -84,6 +85,7 @@ describe('Post API', () => {
       content: postUpdateData.content,
       blogId: blog.id,
       blogName: blog.name,
+      createdAt: createdPost.createdAt,
     });
   });
 
@@ -116,6 +118,7 @@ describe('Post API', () => {
       ...postByBlogDto,
       blogId: blog.id,
       blogName: blog.name,
+      createdAt: expect.any(String),
     });
     expect(blogId).toBe(blog.id);
   });
@@ -132,7 +135,9 @@ describe('Post API', () => {
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(2);
     expect(
-      response.body.every((post: { blogId: string }) => post.blogId === blog.id),
+      response.body.every(
+        (post: { blogId: string }) => post.blogId === blog.id,
+      ),
     ).toBe(true);
   });
 

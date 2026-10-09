@@ -2,7 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { BlogInputDto } from '../../../src/blogs/dto/blog.input.dto';
+import { TBlogInputDto } from '../../../src/blogs/dto/blog.input.dto';
 import { BLOGS_PATH } from '../../../src/blogs/constants/blogs.paths';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { clearDb } from '../../utils/clear-db';
@@ -22,13 +22,20 @@ describe('Blog API', () => {
   });
 
   it('✅ should create blog; POST /api/blogs', async () => {
-    const newBlog: BlogInputDto = {
+    const newBlog: TBlogInputDto = {
       ...getBlogDto(),
       name: 'New blog',
       websiteUrl: 'https://new-blog.com',
     };
 
-    await createBlog(app, newBlog);
+    const createdBlog = await createBlog(app, newBlog);
+
+    expect(createdBlog).toEqual({
+      id: expect.any(String),
+      ...newBlog,
+      createdAt: expect.any(String),
+      isMembership: false,
+    });
   });
 
   it('✅ should return blogs list; GET /api/blogs', async () => {
@@ -52,7 +59,7 @@ describe('Blog API', () => {
   it('✅ should update blog; PUT /api/blogs/:id', async () => {
     const createdBlog = await createBlog(app);
 
-    const blogUpdateData: BlogInputDto = {
+    const blogUpdateData: TBlogInputDto = {
       name: 'Updated blog',
       description: 'Updated description',
       websiteUrl: 'https://updated.com',
@@ -62,10 +69,11 @@ describe('Blog API', () => {
 
     const blogResponse = await getBlogById(app, createdBlog.id);
 
-    expect(blogResponse.id).toBe(createdBlog.id);
     expect(blogResponse).toEqual({
       id: createdBlog.id,
       ...blogUpdateData,
+      createdAt: createdBlog.createdAt,
+      isMembership: createdBlog.isMembership,
     });
   });
 

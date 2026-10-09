@@ -6,5 +6,6 @@
     "^.+\\.tsx?$": ["ts-jest", { "tsconfig": "tsconfig.tests.json" }]
   },
   "testMatch": ["**/__tests__/**/*.spec.ts"],
+  "setupFilesAfterEnv": ["<rootDir>/__tests__/jest.setup.ts"],
   "verbose": true
 }

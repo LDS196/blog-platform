@@ -1,9 +1,9 @@
-export type PostByBlogInputDto = {
+export type TPostByBlogInputDto = {
   title: string;
   shortDescription: string;
   content: string;
 };
 
-export type PostInputDto = PostByBlogInputDto & {
+export type TPostInputDto = TPostByBlogInputDto & {
   blogId: string;
 };

@@ -3,7 +3,11 @@ import { blogsRepository } from '../../repositories/blogs.repository';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { mapToBlogsListOutput } from '../mappers/map-list-blogs-to-output';
 
-export function getBlogsListHandler(req: Request, res: Response) {
-  const blogs = blogsRepository.findAll();
-  res.status(HttpStatus.Ok).send(mapToBlogsListOutput(blogs));
+export async function getBlogsListHandler(req: Request, res: Response) {
+  try {
+    const blogs = await blogsRepository.findAll();
+    res.status(HttpStatus.Ok).send(mapToBlogsListOutput(blogs));
+  } catch (error) {
+    res.sendStatus(HttpStatus.InternalServerError);
+  }
 }

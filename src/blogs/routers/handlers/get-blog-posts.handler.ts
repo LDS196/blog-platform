@@ -5,19 +5,25 @@ import { blogsRepository } from '../../repositories/blogs.repository';
 import { postsRepository } from '../../../posts/repositories/posts.repository';
 import { mapToPostsListOutput } from '../../../posts/routers/mappers/map-list-posts-to-output';
 
-export function getBlogPostsHandler(
+export async function getBlogPostsHandler(
   req: Request<{ id: string }>,
   res: Response,
 ) {
-  const blog = blogsRepository.findById(req.params.id);
+  try {
+    const blog = await blogsRepository.findById(req.params.id);
 
-  if (!blog) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(createErrorMessages([{ field: 'id', message: 'Blog not found' }]));
-    return;
+    if (!blog) {
+      res
+        .status(HttpStatus.NotFound)
+        .send(
+          createErrorMessages([{ field: 'id', message: 'Blog not found' }]),
+        );
+      return;
+    }
+
+    const posts = await postsRepository.findByBlogId(req.params.id);
+    res.status(HttpStatus.Ok).send(mapToPostsListOutput(posts));
+  } catch (error) {
+    res.sendStatus(HttpStatus.InternalServerError);
   }
-
-  const posts = postsRepository.findByBlogId(req.params.id);
-  res.status(HttpStatus.Ok).send(mapToPostsListOutput(posts));
 }

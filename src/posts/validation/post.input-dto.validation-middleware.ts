@@ -23,11 +23,11 @@ const blogIdValidation = body('blogId')
   .isString()
   .trim()
   .withMessage('Blog ID must be a string')
-  .custom((blogId: string) => {
-    if (!blogsRepository.findById(blogId)) {
+  .custom(async (blogId: string) => {
+    const blog = await blogsRepository.findById(blogId);
+    if (!blog) {
       throw new Error('Blog not found');
     }
-    return true;
   });
 
 export const postByBlogInputDtoValidation = [
