@@ -19,7 +19,7 @@ describe('Post API', () => {
 
   const adminToken = generateBasicAuthToken();
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await clearDb(app);
   });
 
@@ -45,13 +45,72 @@ describe('Post API', () => {
 
   it('✅ should return posts list; GET /api/posts', async () => {
     const blog = await createBlog(app);
-    await createPost(app, blog.id);
-    await createPost(app, blog.id);
+    const firstPost = await createPost(app, blog.id);
+    const secondPost = await createPost(app, blog.id);
 
     const response = await request(app).get(POSTS_PATH).expect(HttpStatus.Ok);
 
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body.length).toBeGreaterThanOrEqual(2);
+    expect(response.body).toMatchObject({
+      page: 1,
+      pageSize: 10,
+      pageCount: 1,
+      totalCount: 2,
+    });
+    expect(response.body.items.map((post: { id: string }) => post.id)).toEqual(
+      expect.arrayContaining([firstPost.id, secondPost.id]),
+    );
+  });
+
+  it('✅ should paginate posts; GET /api/posts?pageNumber&pageSize', async () => {
+    const blog = await createBlog(app);
+    const firstPost = await createPost(app, blog.id, { title: 'pg-1' });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const secondPost = await createPost(app, blog.id, { title: 'pg-2' });
+
+    const query = {
+      pageSize: 1,
+      sortBy: 'createdAt',
+      sortDirection: 'asc',
+    };
+
+    const page1 = await request(app)
+      .get(POSTS_PATH)
+      .query({ ...query, pageNumber: 1 })
+      .expect(HttpStatus.Ok);
+
+    expect(page1.body).toMatchObject({
+      page: 1,
+      pageSize: 1,
+      totalCount: 2,
+      pageCount: 2,
+      items: [expect.objectContaining({ id: firstPost.id })],
+    });
+
+    const page2 = await request(app)
+      .get(POSTS_PATH)
+      .query({ ...query, pageNumber: 2 })
+      .expect(HttpStatus.Ok);
+
+    expect(page2.body.items).toEqual([
+      expect.objectContaining({ id: secondPost.id }),
+    ]);
+  });
+
+  it('✅ should sort posts by createdAt; GET /api/posts?sortBy&sortDirection', async () => {
+    const blog = await createBlog(app);
+    const olderPost = await createPost(app, blog.id, { title: 'older' });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const newerPost = await createPost(app, blog.id, { title: 'newer' });
+
+    const response = await request(app)
+      .get(POSTS_PATH)
+      .query({ sortBy: 'createdAt', sortDirection: 'desc', pageSize: 10 })
+      .expect(HttpStatus.Ok);
+
+    expect(response.body.items.map((post: { id: string }) => post.id)).toEqual([
+      newerPost.id,
+      olderPost.id,
+    ]);
   });
 
   it('✅ should return post by id; GET /api/posts/:id', async () => {
@@ -87,6 +146,54 @@ describe('Post API', () => {
       blogName: blog.name,
       createdAt: createdPost.createdAt,
     });
+  });
+
+  it('✅ should keep post when update body is unchanged; PUT /api/posts/:id', async () => {
+    const blog = await createBlog(app);
+    const createdPost = await createPost(app, blog.id);
+
+    await request(app)
+      .put(`${POSTS_PATH}/${createdPost.id}`)
+      .set('Authorization', adminToken)
+      .send({
+        title: createdPost.title,
+        shortDescription: createdPost.shortDescription,
+        content: createdPost.content,
+        blogId: createdPost.blogId,
+      })
+      .expect(HttpStatus.NoContent);
+
+    const post = await getPostById(app, createdPost.id);
+    expect(post).toEqual(createdPost);
+  });
+
+  it('❌ should return 404 for invalid post id; GET /api/posts/:id', async () => {
+    const response = await request(app)
+      .get(`${POSTS_PATH}/not-an-id`)
+      .expect(HttpStatus.NotFound);
+
+    expect(response.body.errorsMessages[0].field).toBe('id');
+  });
+
+  it('❌ should return 404 when deleting missing post; DELETE /api/posts/:id', async () => {
+    await request(app)
+      .delete(`${POSTS_PATH}/507f1f77bcf86cd799439011`)
+      .set('Authorization', adminToken)
+      .expect(HttpStatus.NotFound);
+  });
+
+  it('✅ should delete blog posts together with the blog; DELETE /api/blogs/:id', async () => {
+    const blog = await createBlog(app);
+    const createdPost = await createPost(app, blog.id);
+
+    await request(app)
+      .delete(`${BLOGS_PATH}/${blog.id}`)
+      .set('Authorization', adminToken)
+      .expect(HttpStatus.NoContent);
+
+    await request(app)
+      .get(`${POSTS_PATH}/${createdPost.id}`)
+      .expect(HttpStatus.NotFound);
   });
 
   it('✅ should delete post and check after "NOT FOUND"; DELETE /api/posts/:id', async () => {

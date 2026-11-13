@@ -20,7 +20,7 @@ describe('Post API body validation check', () => {
   let blog: TBlogOutputDto;
   let correctDto: TPostInputDto;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await clearDb(app);
     blog = await createBlog(app);
     correctDto = getPostDto(blog.id);
@@ -69,7 +69,8 @@ describe('Post API body validation check', () => {
     expect(invalidDataSet3.body.errorsMessages).toHaveLength(1);
 
     const postListResponse = await request(app).get(POSTS_PATH);
-    expect(postListResponse.body).toHaveLength(0);
+    expect(postListResponse.body.items).toHaveLength(0);
+    expect(postListResponse.body.totalCount).toBe(0);
   });
 
   it('❌ should not create post when blogId does not exist; POST /api/posts', async () => {

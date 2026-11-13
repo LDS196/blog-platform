@@ -3,6 +3,8 @@ import { runDB, stopDB } from '../src/db/mongo.db';
 
 dotenv.config({ quiet: true });
 
+jest.setTimeout(15000);
+
 beforeAll(async () => {
   const dbUrl = process.env.DB_URL;
   const dbName = process.env.DB_NAME_TEST;

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import { POSTS_ROUTES } from '../constants/posts.paths';
 import { getPostsListHandler } from './handlers/get-posts-list.handler';
 import { getPostHandler } from './handlers/get-post.handler';
@@ -9,11 +9,20 @@ import postInputDtoValidation from '../validation/post.input-dto.validation-midd
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
 import { idValidation } from '../../core/middlewares/validation/params-id.validation.middleware';
 import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard.middleware';
+import { sanitizeQueryParams } from '../../core/middlewares/validation/sanitize-query.middleware';
+import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation.middleware';
+import { PostSortField } from '../dto/post-sort-field';
 
 export const postsRouter = Router();
 
 postsRouter
-  .get(POSTS_ROUTES.ROOT, getPostsListHandler)
+  .get(
+    POSTS_ROUTES.ROOT,
+    paginationAndSortingValidation(PostSortField),
+    inputValidationResultMiddleware,
+    sanitizeQueryParams,
+    getPostsListHandler as unknown as RequestHandler,
+  )
   .get(
     POSTS_ROUTES.BY_ID,
     idValidation,

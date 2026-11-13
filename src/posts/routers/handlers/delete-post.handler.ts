@@ -1,20 +1,16 @@
 import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
-import { createErrorMessages } from '../../../core/middlewares/validation/input-validation-result.middleware';
-import { postsRepository } from '../../repositories/posts.repository';
+import { postsService } from '../../service/posts.service';
+import { errorsHandler } from '../../../core/exceptions/errors.handler';
 
 export async function deletePostHandler(
   req: Request<{ id: string }>,
   res: Response,
 ) {
-  const isDeleted = await postsRepository.delete(req.params.id);
-
-  if (!isDeleted) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(createErrorMessages([{ field: 'id', message: 'Post not found' }]));
-    return;
+  try {
+    await postsService.delete(req.params.id);
+    res.sendStatus(HttpStatus.NoContent);
+  } catch (error) {
+    errorsHandler(error, res);
   }
-
-  res.sendStatus(HttpStatus.NoContent);
 }

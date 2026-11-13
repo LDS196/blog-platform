@@ -1,43 +1,25 @@
 import { Request, Response } from 'express';
-import { postsRepository } from '../../repositories/posts.repository';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { TPostInputDto } from '../../dto/post.input.dto';
-import { createErrorMessages } from '../../../core/middlewares/validation/input-validation-result.middleware';
-import { blogsRepository } from '../../../blogs/repositories/blogs.repository';
-import { mapToPostOutput } from '../mappers/map-list-posts-to-output';
+import { blogsService } from '../../../blogs/service/blogs.service';
+import { postsService } from '../../service/posts.service';
+import { errorsHandler } from '../../../core/exceptions/errors.handler';
 
 export async function createPostHandler(
   req: Request<{}, {}, TPostInputDto>,
   res: Response,
 ) {
   try {
-    const blog = await blogsRepository.findById(req.body.blogId);
-    if (!blog) {
-      res
-        .status(HttpStatus.BadRequest)
-        .send(
-          createErrorMessages([{ field: 'blogId', message: 'Blog not found' }]),
-        );
-      return;
-    }
-    const newPost = {
+    const blog = await blogsService.findById(req.body.blogId);
+    const createdPost = await postsService.create({
       ...req.body,
-      createdAt: new Date().toISOString(),
+      blogId: blog.id,
       blogName: blog.name,
-    };
-    const createdPost = await postsRepository.create(newPost);
+      createdAt: new Date().toISOString(),
+    });
 
-    if (!createdPost) {
-      res
-        .status(HttpStatus.BadRequest)
-        .send(
-          createErrorMessages([{ field: 'blogId', message: 'Blog not found' }]),
-        );
-      return;
-    }
-
-    res.status(HttpStatus.Created).send(mapToPostOutput(createdPost));
+    res.status(HttpStatus.Created).send(createdPost);
   } catch (error) {
-    res.sendStatus(HttpStatus.InternalServerError);
+    errorsHandler(error, res);
   }
 }

@@ -17,7 +17,7 @@ describe('Blog API body validation check', () => {
   const adminToken = generateBasicAuthToken();
   const correctDto: TBlogInputDto = getBlogDto();
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await clearDb(app);
   });
 
@@ -29,6 +29,8 @@ describe('Blog API body validation check', () => {
   });
 
   it(`❌ should not create blog when incorrect body passed; POST /api/blogs`, async () => {
+    await clearDb(app);
+
     const invalidDataSet1 = await request(app)
       .post(BLOGS_PATH)
       .set('Authorization', adminToken)
@@ -64,7 +66,8 @@ describe('Blog API body validation check', () => {
     expect(invalidDataSet3.body.errorsMessages).toHaveLength(1);
 
     const blogListResponse = await request(app).get(BLOGS_PATH);
-    expect(blogListResponse.body).toHaveLength(0);
+    expect(blogListResponse.body.items).toHaveLength(0);
+    expect(blogListResponse.body.totalCount).toBe(0);
   });
 
   it('❌ should not update blog when incorrect data passed; PUT /api/blogs/:id', async () => {

@@ -142,7 +142,8 @@ components:
           example: '507f1f77bcf86cd799439011'
     PostOutput:
       type: object
-      required: [id, title, shortDescription, content, blogId, blogName, createdAt]
+      required:
+        [id, title, shortDescription, content, blogId, blogName, createdAt]
       properties:
         id:
           type: string

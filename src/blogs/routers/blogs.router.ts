@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import { BLOGS_ROUTES } from '../constants/blogs.paths';
 import { getBlogsListHandler } from './handlers/get-blogs-list.handler';
 import { getBlogHandler } from './handlers/get-blog.handler';
@@ -12,11 +12,22 @@ import { postByBlogInputDtoValidation } from '../../posts/validation/post.input-
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
 import { idValidation } from '../../core/middlewares/validation/params-id.validation.middleware';
 import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard.middleware';
+import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation.middleware';
+import { sanitizeQueryParams } from '../../core/middlewares/validation/sanitize-query.middleware';
+import { BlogSortField } from '../dto/blog-sort-field';
+import { searchBlogNameTermValidation } from '../validation/blog-query.validation-middleware';
 
 export const blogsRouter = Router();
 
 blogsRouter
-  .get(BLOGS_ROUTES.ROOT, getBlogsListHandler)
+  .get(
+    BLOGS_ROUTES.ROOT,
+    paginationAndSortingValidation(BlogSortField),
+    searchBlogNameTermValidation,
+    inputValidationResultMiddleware,
+    sanitizeQueryParams,
+    getBlogsListHandler as unknown as RequestHandler,
+  )
   .get(
     BLOGS_ROUTES.POSTS,
     idValidation,

@@ -1,13 +1,26 @@
 import { Request, Response } from 'express';
-import { postsRepository } from '../../repositories/posts.repository';
 import { HttpStatus } from '../../../core/types/http-statuses';
-import { mapToPostsListOutput } from '../mappers/map-list-posts-to-output';
+import { postsService } from '../../service/posts.service';
+import { mapToListPaginatedOutput } from '../../../core/mapper/map-to-list-paginated-output.util';
+import { PostQueryInput } from '../../dto/post-query.input';
+import { TPostOutputDto } from '../../dto/post.output.dto';
+import { errorsHandler } from '../../../core/exceptions/errors.handler';
 
-export async function getPostsListHandler(req: Request, res: Response) {
+export async function getPostsListHandler(
+  req: Request<{}, {}, {}, PostQueryInput>,
+  res: Response,
+) {
   try {
-    const posts = await postsRepository.findAll();
-    res.status(HttpStatus.Ok).send(mapToPostsListOutput(posts));
+    const queryInput = req.query;
+    const { posts, totalCount } = await postsService.findMany(queryInput);
+    const postsOutput = mapToListPaginatedOutput<TPostOutputDto>({
+      pageNumber: queryInput.pageNumber,
+      pageSize: queryInput.pageSize,
+      totalCount,
+      items: posts,
+    });
+    res.status(HttpStatus.Ok).send(postsOutput);
   } catch (error) {
-    res.sendStatus(HttpStatus.InternalServerError);
+    errorsHandler(error, res);
   }
 }
