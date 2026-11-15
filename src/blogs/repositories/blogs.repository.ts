@@ -16,13 +16,13 @@ export const blogsRepository = {
     items: WithId<TBlog>[];
     totalCount: number;
   }> => {
-    const { pageNumber, pageSize, sortBy, sortDirection, searchBlogNameTerm } =
+    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
       query;
     const filter =
-      typeof searchBlogNameTerm === 'string' && searchBlogNameTerm !== ''
+      typeof searchNameTerm === 'string' && searchNameTerm !== ''
         ? {
             name: {
-              $regex: escapeRegex(searchBlogNameTerm),
+              $regex: escapeRegex(searchNameTerm),
               $options: 'i' as const,
             },
           }

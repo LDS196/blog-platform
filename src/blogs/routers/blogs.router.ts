@@ -16,7 +16,7 @@ import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.gu
 import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation.middleware';
 import { sanitizeQueryParams } from '../../core/middlewares/validation/sanitize-query.middleware';
 import { BlogSortField } from '../dto/blog-sort-field';
-import { searchBlogNameTermValidation } from '../validation/blog-query.validation-middleware';
+import { searchNameTermValidation } from '../validation/blog-query.validation-middleware';
 
 export const blogsRouter = Router();
 
@@ -24,7 +24,7 @@ blogsRouter
   .get(
     BLOGS_ROUTES.ROOT,
     paginationAndSortingValidation(BlogSortField),
-    searchBlogNameTermValidation,
+    searchNameTermValidation,
     inputValidationResultMiddleware,
     sanitizeQueryParams,
     getBlogsListHandler as unknown as RequestHandler,

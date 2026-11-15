@@ -66,7 +66,7 @@ describe('Blog API', () => {
     await createBlog(app, { name: firstName });
 
     const query = {
-      searchBlogNameTerm: term,
+      searchNameTerm: term,
       sortBy: 'name',
       sortDirection: 'asc',
       pageSize: 1,
@@ -105,7 +105,7 @@ describe('Blog API', () => {
     const response = await request(app)
       .get(BLOGS_PATH)
       .query({
-        searchBlogNameTerm: term,
+        searchNameTerm: term,
         sortBy: 'name',
         sortDirection: 'asc',
         pageSize: 10,
@@ -116,7 +116,7 @@ describe('Blog API', () => {
     expect(names).toEqual([`${term}aaa`, `${term}zzz`]);
   });
 
-  it('✅ should search blogs by name; GET /api/blogs?searchBlogNameTerm', async () => {
+  it('✅ should search blogs by name; GET /api/blogs?searchNameTerm', async () => {
     const term = uniqueNamePrefix();
     const matchName = `${term}hit`;
     await createBlog(app, { name: matchName });
@@ -124,7 +124,7 @@ describe('Blog API', () => {
 
     const response = await request(app)
       .get(BLOGS_PATH)
-      .query({ searchBlogNameTerm: term, pageSize: 50 })
+      .query({ searchNameTerm: term, pageSize: 50 })
       .expect(HttpStatus.Ok);
 
     expect(response.body.totalCount).toBe(1);
@@ -178,13 +178,13 @@ describe('Blog API', () => {
     expect(blog).toEqual(createdBlog);
   });
 
-  it('✅ should search blog name literally; GET /api/blogs?searchBlogNameTerm', async () => {
+  it('✅ should search blog name literally; GET /api/blogs?searchNameTerm', async () => {
     await createBlog(app, { name: 'a.b' });
     await createBlog(app, { name: 'axb' });
 
     const literal = await request(app)
       .get(BLOGS_PATH)
-      .query({ searchBlogNameTerm: 'a.b' })
+      .query({ searchNameTerm: 'a.b' })
       .expect(HttpStatus.Ok);
 
     expect(literal.body.totalCount).toBe(1);
@@ -192,7 +192,7 @@ describe('Blog API', () => {
 
     const special = await request(app)
       .get(BLOGS_PATH)
-      .query({ searchBlogNameTerm: '(' })
+      .query({ searchNameTerm: '(' })
       .expect(HttpStatus.Ok);
 
     expect(special.body.totalCount).toBe(0);
