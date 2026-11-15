@@ -7,16 +7,30 @@ paths:
     get:
       operationId: getPosts
       tags: [Posts]
-      summary: Get all posts
+      summary: Get posts page
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [createdAt]
+            default: createdAt
+        - $ref: '#/components/parameters/SortDirection'
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostOutput'
+                $ref: '#/components/schemas/PostListOutput'
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
     post:
       operationId: createPost
       tags: [Posts]
@@ -140,6 +154,32 @@ components:
           type: string
           pattern: '^[0-9a-fA-F]{24}$'
           example: '507f1f77bcf86cd799439011'
+    PostByBlogInput:
+      type: object
+      required: [title, shortDescription, content]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 30
+        shortDescription:
+          type: string
+          minLength: 1
+          maxLength: 100
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    PostListOutput:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PostOutput'
     PostOutput:
       type: object
       required:
