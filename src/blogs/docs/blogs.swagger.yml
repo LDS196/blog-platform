@@ -142,16 +142,24 @@ paths:
     get:
       operationId: getBlogPosts
       tags: [Blogs]
-      summary: Get posts of blog
+      summary: Get posts page of blog
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [createdAt]
+            default: createdAt
+        - $ref: '#/components/parameters/SortDirection'
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostOutput'
+                $ref: '#/components/schemas/PostListOutput'
         400:
           description: Validation error
           content:

@@ -51,7 +51,7 @@ describe('Blog API', () => {
     expect(response.body).toMatchObject({
       page: 1,
       pageSize: 10,
-      pageCount: expect.any(Number),
+      pagesCount: expect.any(Number),
       totalCount: expect.any(Number),
       items: expect.any(Array),
     });
@@ -81,7 +81,7 @@ describe('Blog API', () => {
       page: 1,
       pageSize: 1,
       totalCount: 2,
-      pageCount: 2,
+      pagesCount: 2,
       items: [expect.objectContaining({ name: firstName })],
     });
 

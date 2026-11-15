@@ -9,17 +9,17 @@ export function mapToListPaginatedOutput<T>({
   totalCount: number;
   items: T[];
 }): {
+  pagesCount: number;
   page: number;
   pageSize: number;
-  pageCount: number;
   totalCount: number;
   items: T[];
 } {
-  const meta = {
+  return {
+    pagesCount: Math.ceil(totalCount / pageSize),
     page: pageNumber,
     pageSize,
-    pageCount: Math.ceil(totalCount / pageSize),
     totalCount,
+    items,
   };
-  return { items, ...meta };
 }

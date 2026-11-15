@@ -53,7 +53,7 @@ describe('Post API', () => {
     expect(response.body).toMatchObject({
       page: 1,
       pageSize: 10,
-      pageCount: 1,
+      pagesCount: 1,
       totalCount: 2,
     });
     expect(response.body.items.map((post: { id: string }) => post.id)).toEqual(
@@ -82,7 +82,7 @@ describe('Post API', () => {
       page: 1,
       pageSize: 1,
       totalCount: 2,
-      pageCount: 2,
+      pagesCount: 2,
       items: [expect.objectContaining({ id: firstPost.id })],
     });
 
@@ -239,10 +239,15 @@ describe('Post API', () => {
       .get(`${BLOGS_PATH}/${blog.id}/posts`)
       .expect(HttpStatus.Ok);
 
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(2);
+    expect(response.body).toMatchObject({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 2,
+    });
+    expect(response.body.items).toHaveLength(2);
     expect(
-      response.body.every(
+      response.body.items.every(
         (post: { blogId: string }) => post.blogId === blog.id,
       ),
     ).toBe(true);

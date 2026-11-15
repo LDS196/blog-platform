@@ -29,8 +29,22 @@ export const postsRepository = {
     }
     return postsCollection.findOne({ _id: objectId });
   },
-  findByBlogId: async (blogId: string): Promise<WithId<TPost>[]> => {
-    return await postsCollection.find({ blogId }).toArray();
+  findByBlogId: async (
+    blogId: string,
+    queryInput: PostQueryInput,
+  ): Promise<{ posts: WithId<TPost>[]; totalCount: number }> => {
+    const { pageNumber, pageSize, sortBy, sortDirection } = queryInput;
+    const filter = { blogId };
+    const skip = (pageNumber - 1) * pageSize;
+    const sort = { [sortBy]: sortDirection };
+    const posts = await postsCollection
+      .find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+    const totalCount = await postsCollection.countDocuments(filter);
+    return { posts, totalCount };
   },
   create: async (post: TPost): Promise<WithId<TPost> | null> => {
     const result = await postsCollection.insertOne(post);

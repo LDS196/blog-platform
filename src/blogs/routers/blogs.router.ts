@@ -8,6 +8,7 @@ import { getBlogPostsHandler } from './handlers/get-blog-posts.handler';
 import { createBlogPostHandler } from './handlers/create-blog-post.handler';
 import { deleteBlogHandler } from './handlers/delete-blog.handler';
 import blogInputDtoValidation from '../validation/blog.input-dto.validition-middleware';
+import { PostSortField } from '../../posts/dto/post-sort-field';
 import { postByBlogInputDtoValidation } from '../../posts/validation/post.input-dto.validation-middleware';
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
 import { idValidation } from '../../core/middlewares/validation/params-id.validation.middleware';
@@ -31,8 +32,10 @@ blogsRouter
   .get(
     BLOGS_ROUTES.POSTS,
     idValidation,
+    paginationAndSortingValidation(PostSortField),
     inputValidationResultMiddleware,
-    getBlogPostsHandler,
+    sanitizeQueryParams,
+    getBlogPostsHandler as unknown as RequestHandler,
   )
   .get(
     BLOGS_ROUTES.BY_ID,

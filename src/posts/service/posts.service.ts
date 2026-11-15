@@ -21,9 +21,15 @@ export const postsService = {
     }
     return mapToPostOutput(post);
   },
-  async findByBlogId(blogId: string): Promise<TPostOutputDto[]> {
-    const posts = await postsRepository.findByBlogId(blogId);
-    return posts.map(mapToPostOutput);
+  async findByBlogId(
+    blogId: string,
+    queryInput: PostQueryInput,
+  ): Promise<{ posts: TPostOutputDto[]; totalCount: number }> {
+    const { posts, totalCount } = await postsRepository.findByBlogId(
+      blogId,
+      queryInput,
+    );
+    return { posts: posts.map(mapToPostOutput), totalCount };
   },
   async create(post: TPost): Promise<TPostOutputDto> {
     const createdPost = await postsRepository.create(post);

@@ -52,8 +52,12 @@ components:
 
     Pagination:
       type: object
-      required: [page, pageSize, pageCount, totalCount]
+      required: [pagesCount, page, pageSize, totalCount]
       properties:
+        pagesCount:
+          type: integer
+          minimum: 0
+          example: 1
         page:
           type: integer
           minimum: 1
@@ -63,10 +67,6 @@ components:
           minimum: 1
           maximum: 100
           example: 10
-        pageCount:
-          type: integer
-          minimum: 0
-          example: 1
         totalCount:
           type: integer
           minimum: 0
