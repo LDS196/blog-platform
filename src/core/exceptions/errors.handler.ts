@@ -3,10 +3,30 @@ import { NotFoundException } from './not-found.exception';
 import { HttpStatus } from '../types/http-statuses';
 import { createErrorMessages } from '../middlewares/validation/input-validation-result.middleware';
 import { DomainException } from './domain.exception';
+import { BadRequestException } from './bad-request.exception';
+import { UnauthorizedException } from './unauthorized.exception';
 
 // Единая точка обработки исключений для подхода "через throw" (модуль drivers).
 // Превращает кастомные исключения в HTTP-ответ в формате JSON:API-ошибок.
 export function errorsHandler(error: unknown, res: Response): void {
+  if (error instanceof UnauthorizedException) {
+    res.sendStatus(HttpStatus.Unauthorized);
+    return;
+  }
+
+  if (error instanceof BadRequestException) {
+    res.status(HttpStatus.BadRequest).send(
+      createErrorMessages([
+        {
+          field: error.field,
+          message: error.message,
+        },
+      ]),
+    );
+
+    return;
+  }
+
   if (error instanceof NotFoundException) {
     const httpStatus = HttpStatus.NotFound;
 

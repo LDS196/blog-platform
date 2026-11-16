@@ -1,0 +1,38 @@
+tags:
+  - name: Auth
+    description: Login
+
+paths:
+  /api/auth/login:
+    post:
+      operationId: login
+      tags: [Auth]
+      summary: Try login user to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        204:
+          description: If Login and Password are correct
+        400:
+          description: If the inputModel has incorrect values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        401:
+          description: If the password or login is wrong
+
+components:
+  schemas:
+    LoginInput:
+      type: object
+      required: [loginOrEmail, password]
+      properties:
+        loginOrEmail:
+          type: string
+        password:
+          type: string

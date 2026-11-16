@@ -1,0 +1,136 @@
+tags:
+  - name: Users
+    description: Users CRUD
+
+paths:
+  /api/users:
+    get:
+      operationId: getUsers
+      tags: [Users]
+      summary: Returns all users
+      security:
+        - basicAuth: []
+      parameters:
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [createdAt, login, email, id]
+            default: createdAt
+        - $ref: '#/components/parameters/SortDirection'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: searchLoginTerm
+          in: query
+          schema:
+            type: string
+            nullable: true
+          description: Search term for user Login. Login should contain this term in any position
+        - name: searchEmailTerm
+          in: query
+          schema:
+            type: string
+            nullable: true
+          description: Search term for user Email. Email should contain this term in any position
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListOutput'
+        401:
+          description: Unauthorized
+    post:
+      operationId: createUser
+      tags: [Users]
+      summary: Add new user to the system
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        201:
+          description: Returns the newly created user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOutput'
+        400:
+          description: If the inputModel has incorrect values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        401:
+          description: Unauthorized
+
+  /api/users/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    delete:
+      operationId: deleteUser
+      tags: [Users]
+      summary: Delete user specified by id
+      security:
+        - basicAuth: []
+      responses:
+        204:
+          description: No content
+        401:
+          description: Unauthorized
+        404:
+          description: If specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+components:
+  schemas:
+    UserInput:
+      type: object
+      required: [login, password, email]
+      properties:
+        login:
+          type: string
+          minLength: 3
+          maxLength: 10
+          pattern: '^[a-zA-Z0-9_-]*$'
+        password:
+          type: string
+          minLength: 6
+          maxLength: 20
+        email:
+          type: string
+          pattern: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+          example: example@example.dev
+    UserOutput:
+      type: object
+      required: [id, login, email, createdAt]
+      properties:
+        id:
+          type: string
+          example: '507f1f77bcf86cd799439011'
+        login:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T12:00:00.000Z'
+    UserListOutput:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserOutput'
