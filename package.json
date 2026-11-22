@@ -14,7 +14,8 @@
     "lint": "eslint --fix .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "tunnel": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes -T -R 80:127.0.0.1:5001 nokey@localhost.run"
+    "tunnel": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes -T -R 80:127.0.0.1:5001 lihachevd87@gmail.com@localhost.run",
+    "ngrok": "ngrok http 5001"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

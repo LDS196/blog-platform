@@ -1,3 +1,4 @@
+import os from 'node:os';
 import { Db, MongoClient } from 'mongodb';
 import { initCollections } from './collections';
 
@@ -23,6 +24,9 @@ export async function runDB(
 
   client = new MongoClient(url, {
     serverSelectionTimeoutMS: 5000,
+    // Jest не умеет dynamic import('os') внутри драйвера. Без os metadata
+    // становится пустой, и локальная Mongo рвёт рукопожатие.
+    runtimeAdapters: { os },
   });
   const db: Db = client.db(dbName);
 

@@ -10,7 +10,11 @@ export default app;
 
 if (!process.env.VERCEL) {
   const PORT = process.env.PORT;
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
   });
+  // Checker рвёт запрос на 6 с и переиспользует сокет. Дефолт Node 5 с
+  // закрывает его раньше. 61 с копило соединения на бесплатном ngrok.
+  server.keepAliveTimeout = 15_000;
+  server.headersTimeout = 20_000;
 }
